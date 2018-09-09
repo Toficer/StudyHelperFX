@@ -1,0 +1,228 @@
+/*Background, main window*/
+#mainWindow {
+    -fx-background-color: #ffffff;
+}
+/*Background, title bar, right (buttons)*/
+#topBoxRight {
+     -fx-background-color: #003459;
+}
+/*Background, title bar, left*/
+#topBoxLeft {
+    -fx-background-color: #003459;
+}
+/*Title bar, left label (icon)*/
+#windowTitleLabel{
+    -fx-text-fill: #717171;
+    -fx-font-size: 15
+}
+/*The left panel containing the ListView*/
+#listPanel {
+    -fx-background-color: #003459;
+    -fx-border-color: #007eaf;
+    -fx-border-width: 0 1 0 0;
+}
+#nameLabel {
+    -fx-text-fill: #46494c;
+}
+#descLabel {
+    -fx-text-fill: #46494c;
+}
+#contentsTitleLabel {
+    -fx-text-fill: #46494c;
+    -fx-font-size: 22;
+}
+#upperCenterBox {
+    -fx-border-color: #007eaf;
+    -fx-border-width: 0 0 0 0;
+}
+#questionLabel {
+    -fx-text-fill: #46494c;
+    -fx-font-size: 16
+}
+#mainCenterBox {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 0;
+}
+#centerScrollPane {
+    -fx-background: #ffffff;
+}
+#lowerCenterBox {
+    -fx-background-color: #ffffff;
+    -fx-background-image: url("images/largeLogo.png");
+    -fx-background-position: center top;
+    -fx-background-repeat: no-repeat;
+}
+#folderDialogWindow {
+}
+#nextCardButton {
+    -fx-background-color: #003459;
+    -fx-text-fill: #dcdcdd;
+    -fx-font-size: 18;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+#nextCardButton:hover {
+    -fx-background-color: #003c66;
+    -fx-text-fill: #dcdcdd;
+    -fx-font-size: 18;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+#backButton {
+    -fx-background-color: #003c66;
+    -fx-text-fill: #dcdcdd;
+    -fx-font-size: 18;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+#backButton:hover {
+    -fx-background-color: #005999;
+    -fx-text-fill: #dcdcdd;
+    -fx-font-size: 18;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+/*Menu bar (File, Card...)*/
+.menu-bar {
+     -fx-background-color: #007eaf;
+     -fx-font-size: 22;
+ }
+/*Menu bar font color*/
+.menu .label {
+    -fx-text-fill: #dcdcdd;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+/*?*/
+.menu-item{
+}
+/*Context menu (RMB)*/
+.context-menu{
+    -fx-background-color: #007eaf;
+}
+.context-menu .label {
+    -fx-text-fill: #dcdcdd;
+    -fx-font-size: 20;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+.text-area .scroll-bar {
+    -fx-background-color: #c5c3c6;
+}
+.text-area .scroll-bar:vertical .thumb {
+    -fx-background-color: #003459;
+}
+.text-area .content {
+    -fx-background-color: #ffffff;
+}
+/*Focus highlight of TextAreas*/
+.text-area {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-control-inner-background: #ffffff;
+    -fx-unfocused-color: transparent;
+    -fx-faint-unfocused-color: transparent;
+    -fx-text-fill: black;
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+/*.scroll-pane .scroll-bar {*/
+    /*-fx-background-color: red;*/
+/*}*/
+/*.scroll-pane .scroll-bar:vertical .thumb {*/
+    /*-fx-background-color: #717171;*/
+/*}*/
+/*Focus highlight of ScrollPanes*/
+.scroll-pane {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-control-inner-background: transparent;
+}
+
+.list-cell:odd {
+    -fx-background-color: #003c66;
+    -fx-text-fill: #c5c3c6;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+.list-cell:odd:selected {
+    -fx-background-color: #007eaf;
+    -fx-text-fill: #dcdcdd;
+    -fx-font-family: "Gill Sans MT Condensed";
+    -fx-font-weight: bold;
+}
+.list-cell:even {
+    -fx-background-color: #003459;
+    -fx-text-fill: #c5c3c6;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+.list-cell:even:selected {
+    -fx-background-color: #007eaf;
+    -fx-text-fill: #dcdcdd;
+    -fx-font-family: "Gill Sans MT Condensed";
+    -fx-font-weight: bold;
+}
+.list-view {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b3b1be;
+    -fx-font-size: 25;
+}
+.text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: #003459;
+    -fx-border-width: 0 0 2 0;
+}
+.choice-box {
+    -fx-background-color: transparent;
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+.dialog-pane {
+    -fx-background-color: #ffffff;
+}
+.dialog-pane .header-panel {
+-fx-background-color: #003459;
+-fx-border-width: 0 0 0 0;
+
+}
+.dialog-pane .button-panel {
+-fx-border-width: 0 0 0 0;
+}
+.dialog-pane .header-panel .label{
+-fx-background-color: #003459;
+-fx-text-fill: #c5c3c6;
+-fx-font-size: 18;
+-fx-font-family: "Gill Sans MT Condensed";
+}
+.dialog-pane .button {
+-fx-background-color: #003459;
+-fx-text-fill: #dcdcdd;
+-fx-font-size: 18;
+-fx-font-family: "Gill Sans MT Condensed";
+}
+.dialog-pane .button:hover {
+-fx-background-color: #005999;
+-fx-text-fill: #dcdcdd;
+-fx-font-size: 18;
+-fx-font-family: "Gill Sans MT Condensed";
+}
+.FolderDialog {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+.InfoDialog {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+.DeleteDialog {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+.DeckDialog {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+.CardTypeDialog {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}

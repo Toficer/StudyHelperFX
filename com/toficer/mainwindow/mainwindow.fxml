@@ -1,0 +1,104 @@
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane fx:id="mainWindow" id="mainWindow" fx:controller="com.toficer.mainwindow.MainWindowController" xmlns:fx="http://javafx.com/fxml">
+    <left>
+        <VBox id="listPanel" prefWidth="375" alignment="TOP_CENTER" spacing="5">
+            <VBox fx:id="topBox" alignment="center" prefHeight="150">
+                <BorderPane>
+                    <left>
+                        <HBox alignment="TOP_LEFT" id="topBoxLeft">
+                            <padding>
+                                <Insets left="10"/>
+                            </padding>
+                            <Label id="windowTitleLabel" prefHeight="128">
+                                <graphic>
+                                    <ImageView>
+                                        <Image url="@/images/icon.png"/>
+                                    </ImageView>
+                                </graphic>
+                            </Label>
+                        </HBox>
+                    </left>
+                    <center>
+                        <HBox id="topBoxRight" prefHeight="150" alignment="TOP_RIGHT">
+                            <ImageView fx:id="minimizeButton">
+                                <image>
+                                    <Image url="@/images/minimizeButton.png"/>
+                                </image>
+                            </ImageView>
+                            <ImageView fx:id="exitButton">
+                                <image>
+                                    <Image url="@/images/exitButton.png"/>
+                                </image>
+                            </ImageView>
+                        </HBox>
+                    </center>
+
+                </BorderPane>
+
+                <MenuBar fx:id="menuBar">
+                    <Menu text="File" >
+                        <items>
+                            <MenuItem text="Exit" onAction="#exitHelper"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Create">
+                        <items>
+                            <MenuItem text="New folder..." onAction="#addNewFolder"/>
+                            <MenuItem text="New deck..." onAction="#addNewDeckFromMenu"/>
+                            <MenuItem text="New card..." disable="true"/>
+                            <MenuItem text="New study session..." disable="true"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Settings">
+                        <items>
+                            <MenuItem text="Database" disable="true"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Help/Credits">
+                        <items>
+                            <MenuItem text="How to use" disable="true"/>
+                        </items>
+                        <items>
+                            <MenuItem text="Info/Credits" onAction="#displayInfo"/>
+                        </items>
+                    </Menu>
+                </MenuBar>
+            </VBox>
+            <HBox alignment="CENTER">
+                <Button id="backButton" fx:id="backButton" text="          BACK          " disable="true" onAction="#backToFolders"/>
+            </HBox>
+            <ListView fx:id="mainListView" VBox.vgrow="ALWAYS">
+            </ListView>
+            <HBox alignment="TOP_LEFT">
+                <padding>
+                    <Insets top="3" bottom="3" left="5"/>
+                </padding>
+                <Label fx:id="locationLabel" style="-fx-font-family: 'Gill Sans MT Condensed'; -fx-font-size: 20; -fx-text-fill: #c5c3c6" text="HOME >"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox id="mainCenterBox">
+            <HBox id="upperCenterBox" prefHeight="75" minHeight="75" alignment="CENTER">
+                <Label id="questionLabel" fx:id="questionLabel" wrapText="true" prefWidth="750" lineSpacing="0" alignment="center"/>
+            </HBox>
+            <Separator orientation="HORIZONTAL"/>
+            <ScrollPane id="centerScrollPane" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
+                <padding>
+                    <Insets left="10" top="10" right="10" bottom="10"/>
+                </padding>
+                <VBox fx:id="centerContentBox" id="lowerCenterBox" alignment="TOP_CENTER" prefWidth="825" minHeight="550"/>
+            </ScrollPane>
+            <HBox prefHeight="30" alignment="CENTER">
+                <padding>
+                    <Insets bottom="5" top="5"/>
+                </padding>
+                <Button fx:id="nextCardButton" id="nextCardButton" text="   SHOW ANSWER   " disable="true" onAction="#answerButtonHandler"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
