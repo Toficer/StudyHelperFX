@@ -12,11 +12,14 @@
             <HBox GridPane.rowIndex="1" GridPane.columnIndex="0" alignment="CENTER_RIGHT">
                 <Label id="nameLabel" text="DECK NAME:"/>
             </HBox>
-            <TextField fx:id="folderField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2" prefWidth="300"/>
+            <TextField fx:id="deckField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2" prefWidth="300"/>
             <HBox GridPane.rowIndex="2" GridPane.columnIndex="0" alignment="CENTER_RIGHT">
                 <Label id="descLabel" text="SHORT DESCRIPTION:"/>
             </HBox>
             <TextField fx:id="descriptionField" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+            <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="2" alignment="CENTER_RIGHT">
+                <Label fx:id="warningLabel" id="warningLabel" wrapText="true" text="WARNING: FIELDS MUST NOT BE EMPTY AND MUST NOT CONTAIN CHARACTERS ' OR \" maxWidth="300" visible="false"/>
+            </HBox>
         </GridPane>
     </content>
 </DialogPane>

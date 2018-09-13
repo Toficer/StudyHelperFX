@@ -3,6 +3,7 @@ package com.toficer.dialogs;
 import com.toficer.data.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -15,6 +16,10 @@ public class SimpleTextCardDialogController {
     ChoiceBox<Folder> folderSelector;
     @FXML
     ChoiceBox<Deck> deckSelector;
+    @FXML
+    Label emptyWarningLabel;
+    @FXML
+    Label warningLabel;
 
     @FXML
     public void initialize(){
@@ -25,21 +30,29 @@ public class SimpleTextCardDialogController {
         if(folderSelector.getSelectionModel().getSelectedItem() != null){
             int folder_id = folderSelector.getSelectionModel().getSelectedItem().get_id();
             deckSelector.getItems().setAll(DataModel.getData().getDeckList(folder_id));
+            if(deckSelector.getItems().size() == 0){
+                emptyWarningLabel.setVisible(true);
+                questionField.setText("");
+                questionField.setDisable(true);
+                answerArea.setText("");
+                answerArea.setDisable(true);
+            }
+            else{
+                emptyWarningLabel.setVisible(false);
+                questionField.setText("");
+                questionField.setDisable(false);
+                answerArea.setText("");
+                answerArea.setDisable(false);
+            }
         }
     }
 
     public void createCard(){
-        Card card = new SimpleTextCard();
-        card.setAnswerStatus(false);
-        card.setQuestion(questionField.getText());
-        card.setAnswerStringRepresentation(answerArea.getText());
-        card.setDeckid(deckSelector.getSelectionModel().getSelectedItem().get_id());
-        card.setCardType(DataModel.TYPE_SIMPLETEXT);
+        Card card = new SimpleTextCard(0, questionField.getText(), answerArea.getText(), deckSelector.getSelectionModel().getSelectedItem().get_id(), DataModel.TYPE_SIMPLETEXT);
         DataModel.getData().addCard(card);
     }
 
     public void selectFolder(Folder folder){
-        //folderSelector.getItems().setAll(DataModel.getData().getListViewFolders());
         folderSelector.getSelectionModel().select(folder);
         populateDeckSelector();
     }
@@ -52,5 +65,16 @@ public class SimpleTextCardDialogController {
                 deckSelector.getSelectionModel().select(d);
             }
         }
+    }
+
+    public Boolean validateInput(){
+        if(questionField.getText().length()==0 || questionField.getText().contains("'") || questionField.getText().contains("\\")
+            || answerArea.getText().length()==0 || answerArea.getText().contains("'") || answerArea.getText().contains("\\")
+            || folderSelector.getSelectionModel().getSelectedItem() == null
+            || deckSelector.getSelectionModel().getSelectedItem() == null){
+            warningLabel.setVisible(true);
+            return false;
+        }
+        else return true;
     }
 }

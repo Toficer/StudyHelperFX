@@ -5,16 +5,19 @@ import com.toficer.data.Deck;
 import com.toficer.data.Folder;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 public class DeckDialogController {
 
     @FXML
-    TextField folderField;
+    TextField deckField;
     @FXML
     TextField descriptionField;
     @FXML
     ChoiceBox<Folder> folderSelector;
+    @FXML
+    Label warningLabel;
 
     @FXML
     public void initialize(){
@@ -26,18 +29,20 @@ public class DeckDialogController {
             return null;
         }
         else {
-            String name = folderField.getText().trim();
-            String desc = descriptionField.getText().trim();
-            int folder_id = folderSelector.getSelectionModel().getSelectedItem().get_id();
-            Deck deck = new Deck();
-            deck.setDescription(desc);
-            deck.setName(name);
-            deck.setFolderId(folder_id);
-            System.out.println(deck.toString());
+            Deck deck = new Deck(0, deckField.getText().trim(), descriptionField.getText().trim(), folderSelector.getSelectionModel().getSelectedItem().get_id());
             DataModel.getData().addDeck(deck);
             return deck;
         }
 
+    }
+
+    public Boolean validateInput(){
+        if(deckField.getText().length() == 0 || deckField.getText().contains("'") || deckField.getText().contains("\\")
+                || descriptionField.getText().length() == 0 || descriptionField.getText().contains("'") || descriptionField.getText().contains("\\") || folderSelector.getSelectionModel().getSelectedItem() == null){
+            warningLabel.setVisible(true);
+            return false;
+        }
+        else return true;
     }
 
     public void select(Folder folder){

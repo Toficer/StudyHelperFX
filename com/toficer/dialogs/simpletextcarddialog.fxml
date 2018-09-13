@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ChoiceBox?>
-<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.toficer.dialogs.SimpleTextCardDialogController">
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.toficer.dialogs.SimpleTextCardDialogController" prefWidth="600">
     <content>
         <GridPane hgap="10" vgap="10" alignment="CENTER">
 
@@ -15,6 +15,9 @@
                 <Label id="folderLabel" text="FOLDER:"/>
             </HBox>
             <ChoiceBox fx:id="folderSelector" GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#populateDeckSelector"/>
+            <HBox GridPane.rowIndex="0" GridPane.columnIndex="2" alignment="CENTER_LEFT">
+                <Label fx:id="emptyWarningLabel" id="warningLabel" text="THIS FOLDER IS EMPTY!" wrapText="true" visible="false"/>
+            </HBox>
 
             <HBox GridPane.rowIndex="1" GridPane.columnIndex="0" alignment="CENTER_RIGHT">
                 <Label id="deckLabel" text="DECK:"/>
@@ -29,6 +32,9 @@
                 <Label id="answerLabel" text="ANSWER:"/>
             </HBox>
             <TextArea fx:id="answerArea" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="2"/>
+            <HBox GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="2" alignment="CENTER_RIGHT">
+                <Label fx:id="warningLabel" id="warningLabel" wrapText="true" text="WARNING: FIELDS MUST NOT BE EMPTY AND MUST NOT CONTAIN CHARACTERS ' OR \" visible="false"/>
+            </HBox>
         </GridPane>
     </content>
 </DialogPane>

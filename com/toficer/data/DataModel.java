@@ -8,33 +8,56 @@ import java.util.ArrayList;
 
 public class DataModel {
 
-    public static String DATABASE_TYPE = "jdbc:sqlite:";
-    public static String DATABASE_NAME = "cardbase.db";
-    public static String DATABASE_PATH = "C:\\Users\\Toficer\\Documents\\StudyHelperData\\";
-//    public static String DATABASE_PATH = "";
-    public static String CONNECTION_STRING = DATABASE_TYPE + DATABASE_PATH + DATABASE_NAME;
+    public static final String DATABASE_TYPE_SQLITE = "jdbc:sqlite:";
+    public static final String DATABASE_TYPE_MYSQL = "jdbc:mysql:";
+    public static final String DATABASE_NAME_SQLITE = "cardbase.db";
+    public static final String DATABASE_PATH_SQLITE = "C:\\Users\\Toficer\\Documents\\StudyHelperData\\";
+    public static final String DATABASE_NAME_MYSQL = "studyhelper";
+    public static final String DATABASE_PATH_MYSQL = "//db4free.net:3306/";
+    public static final String CONNECTION_STRING = DATABASE_TYPE_SQLITE + DATABASE_PATH_SQLITE + DATABASE_NAME_SQLITE;
+
     public static final String FOLDER_TABLE = "SH_Folders";
     public static final String FOLDER_ID = "_id";
     public static final String FOLDER_DESC = "description";
     public static final String FOLDER_NAME = "name";
+
     public static final String DECK_TABLE = "SH_Decks";
     public static final String DECK_ID = "_id";
     public static final String DECK_DESC = "description";
     public static final String DECK_NAME = "name";
     public static final String DECK_FOLDERID = "folderid";
+
     public static final String CARD_TABLE = "SH_Cards";
     public static final String CARD_ID = "_id";
     public static final String CARD_QUESTION = "question";
     public static final String CARD_ANSWER = "answer";
     public static final String CARD_DECKID = "deckid";
     public static final String CARD_TYPE = "type";
+
     public static final String TYPE_SIMPLETEXT = "simpletext";
+
+    // SQLite and MySQL syntax differs a little. To make it easier to switch between the two for the duration of the production,
+    // SQL queries for creating new tables are stored in Strings below and passed to statements.
+    // Also, his way they can be easily edited without the need to search for them in the code.
+
+    public static final String MYSQL_FOLDER_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + FOLDER_TABLE + "  (" + FOLDER_ID +
+            " INTEGER AUTO_INCREMENT, " + FOLDER_NAME + " TEXT, " + FOLDER_DESC + " TEXT, PRIMARY KEY (" + FOLDER_ID + "))";
+
+    public static final String SQLITE_FOLDER_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + FOLDER_TABLE + "  (" + FOLDER_ID +
+            " INTEGER PRIMARY KEY AUTOINCREMENT, " + FOLDER_NAME + " STRING, " + FOLDER_DESC + " STRING)";
+    public static final String SQLITE_DECK_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + DECK_TABLE + "  (" + DECK_ID +
+            " INTEGER PRIMARY KEY AUTOINCREMENT, " + DECK_NAME + " STRING, " + DECK_DESC + " STRING, " + DECK_FOLDERID + " STRING)";
+    public static final String SQLITE_CARD_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + CARD_TABLE + "  (" + CARD_ID +
+            " INTEGER PRIMARY KEY AUTOINCREMENT, " + CARD_QUESTION + " STRING, " + CARD_ANSWER + " STRING, "+ CARD_TYPE + " STRING, " + CARD_DECKID + " INTEGER)";
+
 
     private static DataModel data = new DataModel();
     private ObservableList<Folder> currentListViewFolders;
     private Folder currentFolder;
     private ObservableList<Deck> currentListViewDecks;
     private ArrayList<Deck> currentDeckList;
+    private Deck currentDeck;
+    private ObservableList<Card> currentListViewCards;
     private ArrayList<Card> studySession;
     private Card currentCard;
     private Connection connection;
@@ -47,6 +70,9 @@ public class DataModel {
         return currentListViewFolders;
     }
     public ObservableList<Deck> getListViewDecks() { return currentListViewDecks; }
+    public ObservableList<Card> getListViewCards() {
+        return currentListViewCards;
+    }
 
     private DataModel() {
         openConnection();
@@ -86,6 +112,14 @@ public class DataModel {
         return studySession;
     }
 
+    public Deck getCurrentDeck() {
+        return currentDeck;
+    }
+
+    public void setCurrentDeck(Deck currentDeck) {
+        this.currentDeck = currentDeck;
+    }
+
     public Card getCurrentCard() {
         return currentCard;
     }
@@ -96,21 +130,24 @@ public class DataModel {
 
     public void loadFolders(){
         currentListViewFolders = FXCollections.observableArrayList();
-        populateFolderList();
+        populateFolderListView();
     }
 
     public void loadDecks(Folder folder){
         currentListViewDecks = FXCollections.observableArrayList();
-        int id = folder.get_id();
-        populateDeckListView(id);
+        populateDeckListView(folder.get_id());
     }
 
-    public void populateFolderList(){
+    public void loadCards(Deck deck){
+        currentListViewCards = FXCollections.observableArrayList();
+        populateCardListView(deck.get_id());
+    }
+
+    public void populateFolderListView(){
         try {
             Statement stmt = connection.createStatement();
 
-            stmt.execute("CREATE TABLE IF NOT EXISTS " + FOLDER_TABLE + "  (" + FOLDER_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT, " + FOLDER_NAME + " STRING, " + FOLDER_DESC + " STRING)");
+            stmt.execute(SQLITE_FOLDER_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + FOLDER_TABLE);
             String name, desc;
             int id;
@@ -133,20 +170,11 @@ public class DataModel {
             currentListViewDecks.clear();
             Statement stmt = connection.createStatement();
 
-            stmt.execute("CREATE TABLE IF NOT EXISTS " + DECK_TABLE + "  (" + DECK_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT, " + DECK_NAME + " STRING, " + DECK_DESC + " STRING, " + DECK_FOLDERID + " STRING)");
-
-            System.out.println("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
+            stmt.execute(SQLITE_DECK_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
-            String name, desc;
-            int id;
             if(rs != null){
                 while(rs.next()){
-                    id = rs.getInt(DECK_ID);
-                    name = rs.getString(DECK_NAME);
-                    desc = rs.getString(DECK_DESC);
-
-                    currentListViewDecks.add(new Deck(id, name, desc, folder_id));
+                    currentListViewDecks.add(new Deck(rs.getInt(DECK_ID), rs.getString(DECK_NAME), rs.getString(DECK_DESC), folder_id));
                 }
             }
             stmt.close();
@@ -155,25 +183,35 @@ public class DataModel {
         }
     }
 
+    public void populateCardListView(int deck_id){
+        try {
+            currentListViewCards.clear();
+            Statement stmt = connection.createStatement();
+
+            stmt.execute(SQLITE_CARD_CREATETABLE);
+            ResultSet rs = stmt.executeQuery("SELECT * FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
+            while(rs.next()){
+                if(rs.getString(CARD_TYPE).equals(TYPE_SIMPLETEXT)){
+                    currentListViewCards.add(new SimpleTextCard(rs.getInt(CARD_ID), rs.getString(CARD_QUESTION), rs.getString(CARD_ANSWER), deck_id, TYPE_SIMPLETEXT));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public ArrayList<Deck> getDeckList(int folder_id){
         currentDeckList = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
 
-            stmt.execute("CREATE TABLE IF NOT EXISTS " + DECK_TABLE + "  (" + DECK_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT, " + DECK_NAME + " STRING, " + DECK_DESC + " STRING, " + DECK_FOLDERID + " STRING)");
-
-            System.out.println("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
+            stmt.execute(SQLITE_DECK_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
-            String name, desc;
-            int id;
             if(rs != null){
                 while(rs.next()){
-                    id = rs.getInt(DECK_ID);
-                    name = rs.getString(DECK_NAME);
-                    desc = rs.getString(DECK_DESC);
-
-                    currentDeckList.add(new Deck(id, name, desc, folder_id));
+                    currentDeckList.add(new Deck(rs.getInt(DECK_ID), rs.getString(DECK_NAME), rs.getString(DECK_DESC), folder_id));
                 }
             }
             stmt.close();
@@ -186,8 +224,7 @@ public class DataModel {
     public void addFolder(Folder folder){
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + FOLDER_TABLE + "  (" + FOLDER_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT, " + FOLDER_NAME + " STRING, " + FOLDER_DESC + " STRING)");
+            PreparedStatement stmt = connection.prepareStatement(SQLITE_FOLDER_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + FOLDER_TABLE +
                     " (" + FOLDER_NAME + ", " + FOLDER_DESC + ") VALUES ('" + folder.getName() +
@@ -209,8 +246,7 @@ public class DataModel {
     public void addDeck(Deck deck){
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + DECK_TABLE + "  (" + DECK_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT, " + DECK_NAME + " STRING, " + DECK_DESC + " STRING, " + DECK_FOLDERID + " STRING)");
+            PreparedStatement stmt = connection.prepareStatement(SQLITE_DECK_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + DECK_TABLE +
                     " (" + DECK_NAME + ", " + DECK_DESC + ", " + DECK_FOLDERID + ") VALUES ('" + deck.getName() +
@@ -220,9 +256,6 @@ public class DataModel {
             rs.next();
             int key = rs.getInt(1);
             deck.set_id(key);
-            if(currentListViewDecks != null){
-                currentListViewDecks.add(deck);
-            }
             stmt.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -233,8 +266,7 @@ public class DataModel {
 
     public void addCard(Card card){
         try {
-            PreparedStatement stmt = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + CARD_TABLE + "  (" + CARD_ID +
-                    " INTEGER PRIMARY KEY AUTOINCREMENT, " + CARD_QUESTION + " STRING, " + CARD_ANSWER + " STRING, "+ CARD_TYPE + " STRING, " + CARD_DECKID + " INTEGER)");
+            PreparedStatement stmt = connection.prepareStatement(SQLITE_CARD_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + CARD_TABLE +
                     " (" + CARD_QUESTION + ", " + CARD_ANSWER + ", " + CARD_TYPE + ", " + CARD_DECKID + ") VALUES ('" + card.getQuestion() +
@@ -258,22 +290,11 @@ public class DataModel {
             ResultSet rs = stmt.executeQuery("SELECT count(*) AS count FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
             int count;
             count = rs.getInt("count");
-            System.out.println("SELECT count(*) FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id + "    COUNT " + count);
             if(count>0){
                 rs = stmt.executeQuery("SELECT * FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
-                String answer;
-                String question;
-                int _id;
                 while(rs.next()){
-                    System.out.println(rs.getString(CARD_TYPE));
                     if(rs.getString(CARD_TYPE).equals(TYPE_SIMPLETEXT)){
-                        Card card = new SimpleTextCard();
-                        card.setAnswerStringRepresentation(rs.getString(CARD_ANSWER));
-                        card.set_id(rs.getInt(CARD_ID));
-                        card.setCardType(TYPE_SIMPLETEXT);
-                        card.setDeckid(deck_id);
-                        card.setQuestion(rs.getString(CARD_QUESTION));
-                        card.setAnswerStatus(false);
+                        Card card = new SimpleTextCard(rs.getInt(CARD_ID), rs.getString(CARD_QUESTION), rs.getString(CARD_ANSWER), deck_id, TYPE_SIMPLETEXT);
                         studySession.add(card);
                     }
                 }

@@ -48,7 +48,7 @@
                         <items>
                             <MenuItem text="New folder..." onAction="#addNewFolder"/>
                             <MenuItem text="New deck..." onAction="#addNewDeckFromMenu"/>
-                            <MenuItem text="New card..." disable="true"/>
+                            <MenuItem text="New card..." onAction="#displayCardTypeSelectionDialogFromMenu"/>
                             <MenuItem text="New study session..." disable="true"/>
                         </items>
                     </Menu>
@@ -68,7 +68,7 @@
                 </MenuBar>
             </VBox>
             <HBox alignment="CENTER">
-                <Button id="backButton" fx:id="backButton" text="          BACK          " disable="true" onAction="#backToFolders"/>
+                <Button id="backButton" fx:id="backButton" text="          BACK          " disable="true" onAction="#backToPreviousList"/>
             </HBox>
             <ListView fx:id="mainListView" VBox.vgrow="ALWAYS">
             </ListView>
@@ -83,11 +83,11 @@
 
     <center>
         <VBox id="mainCenterBox">
-            <HBox id="upperCenterBox" prefHeight="75" minHeight="75" alignment="CENTER">
+            <HBox id="upperCenterBox" minHeight="75" alignment="CENTER">
                 <Label id="questionLabel" fx:id="questionLabel" wrapText="true" prefWidth="750" lineSpacing="0" alignment="center"/>
             </HBox>
             <Separator orientation="HORIZONTAL"/>
-            <ScrollPane id="centerScrollPane" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
+            <ScrollPane fx:id="centerScrollPane" id="centerScrollPane" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
                 <padding>
                     <Insets left="10" top="10" right="10" bottom="10"/>
                 </padding>

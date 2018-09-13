@@ -21,9 +21,8 @@ public class Main extends Application {
             primaryStage.getIcons().add(new Image("images/trayicon.png"));
         }
         catch (Exception e){
-
+            System.err.println("Couldn't load the tray icon!");
         }
-
 
         MainWindowController controller = (MainWindowController)loader.getController();
         controller.setStage(primaryStage);

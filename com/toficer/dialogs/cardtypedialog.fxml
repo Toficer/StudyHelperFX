@@ -11,6 +11,9 @@
                 <Label text="CART TYPE:"/>
             </HBox>
             <ChoiceBox fx:id="cardTypeSelector" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <HBox GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2" alignment="CENTER_RIGHT">
+                <Label fx:id="warningLabel" id="warningLabel" wrapText="true" text="WARNING: FIELDS MUST NOT BE EMPTY AND MUST NOT CONTAIN CHARACTERS ' OR \" maxWidth="300" visible="false"/>
+            </HBox>
         </GridPane>
     </content>
 </DialogPane>

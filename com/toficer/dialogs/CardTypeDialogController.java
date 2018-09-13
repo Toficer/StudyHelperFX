@@ -1,12 +1,10 @@
 package com.toficer.dialogs;
 
 import com.toficer.data.Deck;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.StageStyle;
 
@@ -17,14 +15,26 @@ public class CardTypeDialogController {
 
     public static final int INPUT_MENU = 0;
     public static final int INPUT_CONTEXT = 1;
+    private double xOffsetDialog = 0;
+    private double yOffsetDialog = 0;
 
     @FXML
     ChoiceBox<String> cardTypeSelector;
+    @FXML
+    Label warningLabel;
 
     @FXML
     public void initialize(){
         cardTypeSelector.getItems().add("Simple text card");
         //cardTypeSelector.getItems().add("Multiple choice card");
+    }
+
+    public Boolean validateInput(){
+        if(cardTypeSelector.getSelectionModel().getSelectedItem() == null){
+            warningLabel.setVisible(true);
+            return false;
+        }
+        else return true;
     }
 
     public void addNewCard(BorderPane mainWindow, ListView mainListView, int input){
@@ -43,21 +53,37 @@ public class CardTypeDialogController {
                 dialog.getDialogPane().getStyleClass().add("SimpleTextCardDialog");
 
             }catch (IOException e){
-                System.out.println("Couldn't load the dialog.");
+                System.err.println("Couldn't load the dialog.");
                 e.printStackTrace();
                 return;
             }
 
             SimpleTextCardDialogController controller = fxmlLoader.getController();
+
             if(input == INPUT_CONTEXT){
-                System.out.println("SELECT DECK");
                 Deck deck = (Deck)mainListView.getSelectionModel().getSelectedItem();
-                System.out.println(deck.getDescription());
                 controller.selectDeck(deck);
             }
 
             dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
             dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+
+            final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+            okButton.addEventFilter(ActionEvent.ACTION, event -> {
+                if (!controller.validateInput()) event.consume();
+            });
+
+            xOffsetDialog = 0;
+            yOffsetDialog = 0;
+
+            dialog.getDialogPane().setOnMousePressed(event -> {
+                xOffsetDialog = event.getSceneX();
+                yOffsetDialog = event.getSceneY();
+            });
+            dialog.getDialogPane().setOnMouseDragged(event -> {
+                dialog.setX(event.getScreenX() - xOffsetDialog);
+                dialog.setY(event.getScreenY() - yOffsetDialog);
+            });
 
             Optional<ButtonType> result = dialog.showAndWait();
 
