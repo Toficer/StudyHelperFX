@@ -35,6 +35,7 @@ public class DataModel {
     public static final String CARD_TYPE = "type";
 
     public static final String TYPE_SIMPLETEXT = "simpletext";
+    public static final String TYPE_MULTIPLECHOICE = "multiplechoice";
 
     // SQLite and MySQL syntax differs a little. To make it easier to switch between the two for the duration of the production,
     // SQL queries for creating new tables are stored in Strings below and passed to statements.
@@ -194,6 +195,9 @@ public class DataModel {
                 if(rs.getString(CARD_TYPE).equals(TYPE_SIMPLETEXT)){
                     currentListViewCards.add(new SimpleTextCard(rs.getInt(CARD_ID), rs.getString(CARD_QUESTION), rs.getString(CARD_ANSWER), deck_id, TYPE_SIMPLETEXT));
                 }
+                if(rs.getString(CARD_TYPE).equals(TYPE_MULTIPLECHOICE)){
+                    currentListViewCards.add(new MultipleChoiceCard(rs.getInt(CARD_ID), rs.getString(CARD_QUESTION), rs.getString(CARD_ANSWER), deck_id, TYPE_MULTIPLECHOICE));
+                }
             }
 
         } catch (SQLException e) {
@@ -237,10 +241,54 @@ public class DataModel {
             currentListViewFolders.add(folder);
             stmt.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             e.printStackTrace();
         }
 
+    }
+
+    public void updateFolder(Folder folder){
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute("UPDATE " + FOLDER_TABLE +
+                    " SET " + FOLDER_NAME + "='" + folder.getName() + "', " +
+                    FOLDER_DESC + "='" + folder.getDescription() + "' WHERE " +
+                    FOLDER_ID + "=" + folder.get_id());
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateDeck(Deck deck){
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute("UPDATE " + DECK_TABLE +
+                    " SET " + DECK_NAME + "='" + deck.getName() + "', " +
+                    DECK_DESC + "='" + deck.getDescription() + "', " +
+                    DECK_FOLDERID + "=" + deck.getFolderId() + " WHERE " +
+                    DECK_ID + "=" + deck.get_id());
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateCard(Card card){
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute("UPDATE " + CARD_TABLE +
+                    " SET " + CARD_QUESTION + "='" + card.getQuestionStringRepresentation() + "', " +
+                    CARD_ANSWER + "='" + card.getAnswerStringRepresentation() + "', " +
+                    CARD_TYPE + "='" + card.getCardType() + "', " +
+                    CARD_DECKID + "=" + card.getDeckid() + " WHERE " +
+                    CARD_ID + "=" + card.get_id());
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void addDeck(Deck deck){
@@ -269,7 +317,7 @@ public class DataModel {
             PreparedStatement stmt = connection.prepareStatement(SQLITE_CARD_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + CARD_TABLE +
-                    " (" + CARD_QUESTION + ", " + CARD_ANSWER + ", " + CARD_TYPE + ", " + CARD_DECKID + ") VALUES ('" + card.getQuestion() +
+                    " (" + CARD_QUESTION + ", " + CARD_ANSWER + ", " + CARD_TYPE + ", " + CARD_DECKID + ") VALUES ('" + card.getQuestionStringRepresentation() +
                     "', '" + card.getAnswerStringRepresentation() + "', '" + card.getCardType() + "', " + card.getDeckid() + ")", Statement.RETURN_GENERATED_KEYS);
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
@@ -295,6 +343,10 @@ public class DataModel {
                 while(rs.next()){
                     if(rs.getString(CARD_TYPE).equals(TYPE_SIMPLETEXT)){
                         Card card = new SimpleTextCard(rs.getInt(CARD_ID), rs.getString(CARD_QUESTION), rs.getString(CARD_ANSWER), deck_id, TYPE_SIMPLETEXT);
+                        studySession.add(card);
+                    }
+                    if(rs.getString(CARD_TYPE).equals(TYPE_MULTIPLECHOICE)){
+                        Card card = new MultipleChoiceCard(rs.getInt(CARD_ID), rs.getString(CARD_QUESTION), rs.getString(CARD_ANSWER), deck_id, TYPE_MULTIPLECHOICE);
                         studySession.add(card);
                     }
                 }

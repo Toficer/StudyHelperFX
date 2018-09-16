@@ -8,47 +8,44 @@ import javafx.scene.layout.VBox;
 
 public abstract class Card {
     private int _id;
-    private String question;
+    private String questionStringRepresentation;
     private String answerStringRepresentation;
     private int deckid;
     private String cardType;
-    private VBox descriptionBox;
     private static Image cardImage;
 
     public Card() {
         if(cardImage == null){
             cardImage = new Image("images/file.png");
         }
-        createDescriptionBox();
     }
 
-    public Card(int _id, String question, String answerStringRepresentation, int deckid, String cardType) {
+    public Card(int _id, String questionStringRepresentation, String answerStringRepresentation, int deckid, String cardType) {
         this._id = _id;
-        this.question = question;
+        this.questionStringRepresentation = questionStringRepresentation;
         this.answerStringRepresentation = answerStringRepresentation;
         this.deckid = deckid;
         this.cardType = cardType;
         if(cardImage == null){
             cardImage = new Image("images/file.png");
         }
-        createDescriptionBox();
     }
 
-    public void createDescriptionBox(){
-        descriptionBox = new VBox();
+    public VBox getDescriptionBox(){
+
+        VBox descriptionBox = new VBox();
         descriptionBox.setAlignment(Pos.TOP_CENTER);
         descriptionBox.getChildren().add(new ImageView(cardImage));
-        Label nameLabel = new Label(getQuestion());
+        Label nameLabel = new Label(getQuestionStringRepresentation());
         nameLabel.setWrapText(true);
         nameLabel.getStyleClass().add("descriptionLabel");
         descriptionBox.getChildren().add(nameLabel);
         descriptionBox.getChildren().add(getAnswerBox());
-    }
 
-    public VBox getDescriptionBox(){
         return descriptionBox;
     }
 
+    public abstract VBox getQuestionBox();
     public abstract VBox getAnswerBox();
 
     public int get_id() {
@@ -59,12 +56,12 @@ public abstract class Card {
         this._id = _id;
     }
 
-    public String getQuestion() {
-        return question;
+    public String getQuestionStringRepresentation() {
+        return questionStringRepresentation;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setQuestionStringRepresentation(String questionStringRepresentation) {
+        this.questionStringRepresentation = questionStringRepresentation;
     }
 
     public String getAnswerStringRepresentation() {
@@ -89,5 +86,13 @@ public abstract class Card {
 
     public void setCardType(String cardType) {
         this.cardType = cardType;
+    }
+
+    public static Image getCardImage() {
+        return cardImage;
+    }
+
+    public static void setCardImage(Image cardImage) {
+        Card.cardImage = cardImage;
     }
 }

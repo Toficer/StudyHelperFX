@@ -21,6 +21,18 @@ public class FolderDialogController {
             return folder;
     }
 
+    public void loadData(Folder folder){
+        folderField.setText(folder.getName());
+        descriptionField.setText(folder.getDescription());
+    }
+
+    public void updateFolder(Folder folder){
+        folder.setName(folderField.getText().trim());
+        folder.setDescription(descriptionField.getText().trim());
+        folder.createDescriptionBox();
+        DataModel.getData().updateFolder(folder);
+    }
+
     public Boolean validateInput(){
         if(folderField.getText().length() == 0 || folderField.getText().contains("'") || folderField.getText().contains("\\")
                 || descriptionField.getText().length() == 0 || descriptionField.getText().contains("'") || descriptionField.getText().contains("\\")){

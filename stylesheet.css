@@ -129,12 +129,6 @@
     -fx-border-color: #003459;
     -fx-border-width: 1 1 1 1;
 }
-/*.scroll-pane .scroll-bar {*/
-    /*-fx-background-color: red;*/
-/*}*/
-/*.scroll-pane .scroll-bar:vertical .thumb {*/
-    /*-fx-background-color: #717171;*/
-/*}*/
 /*Focus highlight of ScrollPanes*/
 .scroll-pane {
     -fx-faint-focus-color: transparent;
@@ -150,7 +144,8 @@
 }
 
 .list-cell:odd {
-    -fx-background-color: #003c66;
+    /*-fx-background-color: #003c66;*/
+    -fx-background-color: #003459;
     -fx-text-fill: #c5c3c6;
     -fx-font-family: "Gill Sans MT Condensed";
 }
@@ -249,6 +244,10 @@
     -fx-border-width: 1 1 1 1;
 }
 .SimpleTextCardDialog {
+    -fx-border-color: #003459;
+    -fx-border-width: 1 1 1 1;
+}
+.MultipleChoiceCardDialog {
     -fx-border-color: #003459;
     -fx-border-width: 1 1 1 1;
 }

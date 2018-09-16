@@ -32,16 +32,16 @@ public class SimpleTextCardDialogController {
             deckSelector.getItems().setAll(DataModel.getData().getDeckList(folder_id));
             if(deckSelector.getItems().size() == 0){
                 emptyWarningLabel.setVisible(true);
-                questionField.setText("");
+                //questionField.setText("");
                 questionField.setDisable(true);
-                answerArea.setText("");
+                //answerArea.setText("");
                 answerArea.setDisable(true);
             }
             else{
                 emptyWarningLabel.setVisible(false);
-                questionField.setText("");
+                //questionField.setText("");
                 questionField.setDisable(false);
-                answerArea.setText("");
+                //answerArea.setText("");
                 answerArea.setDisable(false);
             }
         }
@@ -50,6 +50,20 @@ public class SimpleTextCardDialogController {
     public void createCard(){
         Card card = new SimpleTextCard(0, questionField.getText(), answerArea.getText(), deckSelector.getSelectionModel().getSelectedItem().get_id(), DataModel.TYPE_SIMPLETEXT);
         DataModel.getData().addCard(card);
+    }
+
+    public void loadData(Card card){
+        selectDeck(DataModel.getData().getCurrentDeck());
+        questionField.setText(card.getQuestionStringRepresentation());
+        answerArea.setText(card.getAnswerStringRepresentation());
+    }
+
+    public void updateCard(Card card){
+        card.setQuestionStringRepresentation(questionField.getText());
+        card.setAnswerStringRepresentation(answerArea.getText());
+        card.setDeckid(deckSelector.getSelectionModel().getSelectedItem().get_id());
+        //card.createDescriptionBox();
+        DataModel.getData().updateCard(card);
     }
 
     public void selectFolder(Folder folder){

@@ -26,7 +26,7 @@ public class CardTypeDialogController {
     @FXML
     public void initialize(){
         cardTypeSelector.getItems().add("Simple text card");
-        //cardTypeSelector.getItems().add("Multiple choice card");
+        cardTypeSelector.getItems().add("Multiple choice card");
     }
 
     public Boolean validateInput(){
@@ -44,6 +44,18 @@ public class CardTypeDialogController {
         dialog.setTitle("CREATE NEW CARD");
         dialog.setHeaderText("NEW CARD: TYPE IN THE DATA AND PRESS OK");
         FXMLLoader fxmlLoader = new FXMLLoader();
+
+        xOffsetDialog = 0;
+        yOffsetDialog = 0;
+
+        dialog.getDialogPane().setOnMousePressed(event -> {
+            xOffsetDialog = event.getSceneX();
+            yOffsetDialog = event.getSceneY();
+        });
+        dialog.getDialogPane().setOnMouseDragged(event -> {
+            dialog.setX(event.getScreenX() - xOffsetDialog);
+            dialog.setY(event.getScreenY() - yOffsetDialog);
+        });
 
         if(cardTypeSelector.getSelectionModel().getSelectedItem().contentEquals("Simple text card")){
             fxmlLoader.setLocation(getClass().getResource("/com/toficer/dialogs/simpletextcarddialog.fxml"));
@@ -73,16 +85,39 @@ public class CardTypeDialogController {
                 if (!controller.validateInput()) event.consume();
             });
 
-            xOffsetDialog = 0;
-            yOffsetDialog = 0;
+            Optional<ButtonType> result = dialog.showAndWait();
 
-            dialog.getDialogPane().setOnMousePressed(event -> {
-                xOffsetDialog = event.getSceneX();
-                yOffsetDialog = event.getSceneY();
-            });
-            dialog.getDialogPane().setOnMouseDragged(event -> {
-                dialog.setX(event.getScreenX() - xOffsetDialog);
-                dialog.setY(event.getScreenY() - yOffsetDialog);
+            if(result.isPresent() && result.get() == ButtonType.OK) {
+                controller.createCard();
+            }
+        }
+
+        else if(cardTypeSelector.getSelectionModel().getSelectedItem().contentEquals("Multiple choice card")){
+            fxmlLoader.setLocation(getClass().getResource("/com/toficer/dialogs/multiplechoicecarddialog.fxml"));
+            try {
+                dialog.getDialogPane().setContent(fxmlLoader.load());
+                dialog.getDialogPane().getStylesheets().add("stylesheet.css");
+                dialog.getDialogPane().getStyleClass().add("MultipleChoiceCardDialog");
+
+            }catch (IOException e){
+                System.err.println("Couldn't load the dialog.");
+                e.printStackTrace();
+                return;
+            }
+
+            MultipleChoiceCardDialogController controller = fxmlLoader.getController();
+
+            if(input == INPUT_CONTEXT){
+                Deck deck = (Deck)mainListView.getSelectionModel().getSelectedItem();
+                controller.selectDeck(deck);
+            }
+
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+
+            final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+            okButton.addEventFilter(ActionEvent.ACTION, event -> {
+                if (!controller.validateInput()) event.consume();
             });
 
             Optional<ButtonType> result = dialog.showAndWait();

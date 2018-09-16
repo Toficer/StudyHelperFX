@@ -36,6 +36,25 @@ public class DeckDialogController {
 
     }
 
+    public void loadData(Deck deck){
+        initialize();
+        for (Folder f : folderSelector.getItems()){
+            if (f.get_id() == deck.getFolderId()){
+                folderSelector.getSelectionModel().select(f);
+            }
+        }
+        deckField.setText(deck.getName());
+        descriptionField.setText(deck.getDescription());
+    }
+
+    public void updateDeck(Deck deck){
+        deck.setName(deckField.getText().trim());
+        deck.setDescription(descriptionField.getText().trim());
+        deck.setFolderId(folderSelector.getSelectionModel().getSelectedItem().get_id());
+        deck.createDescriptionBox();
+        DataModel.getData().updateDeck(deck);
+    }
+
     public Boolean validateInput(){
         if(deckField.getText().length() == 0 || deckField.getText().contains("'") || deckField.getText().contains("\\")
                 || descriptionField.getText().length() == 0 || descriptionField.getText().contains("'") || descriptionField.getText().contains("\\") || folderSelector.getSelectionModel().getSelectedItem() == null){

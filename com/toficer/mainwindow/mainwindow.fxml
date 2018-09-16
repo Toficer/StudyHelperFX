@@ -8,7 +8,7 @@
             <VBox fx:id="topBox" alignment="center" prefHeight="150">
                 <BorderPane>
                     <left>
-                        <HBox alignment="TOP_LEFT" id="topBoxLeft">
+                        <HBox alignment="TOP_LEFT" id="topBoxLeft" minHeight="128">
                             <padding>
                                 <Insets left="10"/>
                             </padding>
@@ -83,10 +83,6 @@
 
     <center>
         <VBox id="mainCenterBox">
-            <HBox id="upperCenterBox" minHeight="75" alignment="CENTER">
-                <Label id="questionLabel" fx:id="questionLabel" wrapText="true" prefWidth="750" lineSpacing="0" alignment="center"/>
-            </HBox>
-            <Separator orientation="HORIZONTAL"/>
             <ScrollPane fx:id="centerScrollPane" id="centerScrollPane" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
                 <padding>
                     <Insets left="10" top="10" right="10" bottom="10"/>
