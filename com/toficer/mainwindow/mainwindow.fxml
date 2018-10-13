@@ -2,10 +2,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="mainWindow" id="mainWindow" fx:controller="com.toficer.mainwindow.MainWindowController" xmlns:fx="http://javafx.com/fxml">
+<BorderPane fx:id="mainWindow" id="mainWindow" fx:controller="com.toficer.mainwindow.MainWindowController" xmlns:fx="http://javafx.com/fxml" stylesheets="@/stylesheet.css">
+
     <left>
         <VBox id="listPanel" prefWidth="375" alignment="TOP_CENTER" spacing="5">
+
             <VBox fx:id="topBox" alignment="center" prefHeight="150">
+
                 <BorderPane>
                     <left>
                         <HBox alignment="TOP_LEFT" id="topBoxLeft" minHeight="128">
@@ -35,7 +38,6 @@
                             </ImageView>
                         </HBox>
                     </center>
-
                 </BorderPane>
 
                 <MenuBar fx:id="menuBar">
@@ -49,7 +51,6 @@
                             <MenuItem text="New folder..." onAction="#addNewFolder"/>
                             <MenuItem text="New deck..." onAction="#addNewDeckFromMenu"/>
                             <MenuItem text="New card..." onAction="#displayCardTypeSelectionDialogFromMenu"/>
-                            <MenuItem text="New study session..." disable="true"/>
                         </items>
                     </Menu>
                     <Menu text="Settings">
@@ -66,35 +67,51 @@
                         </items>
                     </Menu>
                 </MenuBar>
+
             </VBox>
-            <HBox alignment="CENTER">
-                <Button id="backButton" fx:id="backButton" text="          BACK          " disable="true" onAction="#backToPreviousList"/>
-            </HBox>
-            <ListView fx:id="mainListView" VBox.vgrow="ALWAYS">
-            </ListView>
-            <HBox alignment="TOP_LEFT">
+
+            <ListView fx:id="mainListView" VBox.vgrow="ALWAYS"></ListView>
+
+            <HBox alignment="CENTER_LEFT" spacing="5">
                 <padding>
-                    <Insets top="3" bottom="3" left="5"/>
+                    <Insets top="3" bottom="5" left="5"/>
                 </padding>
+                <Button id="backButton" fx:id="backButton" text="BACK" disable="true" onAction="#backToPreviousList">
+                    <graphic>
+                        <ImageView>
+                            <image>
+                                <Image url="@/images/back.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
                 <Label fx:id="locationLabel" style="-fx-font-family: 'Gill Sans MT Condensed'; -fx-font-size: 20; -fx-text-fill: #c5c3c6" text="HOME >"/>
             </HBox>
+
         </VBox>
     </left>
 
     <center>
+
         <VBox id="mainCenterBox">
+
             <ScrollPane fx:id="centerScrollPane" id="centerScrollPane" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
                 <padding>
                     <Insets left="10" top="10" right="10" bottom="10"/>
                 </padding>
-                <VBox fx:id="centerContentBox" id="lowerCenterBox" alignment="TOP_CENTER" prefWidth="825" minHeight="550"/>
+                <VBox fx:id="centerContentBox" id="lowerCenterBox" alignment="TOP_CENTER" prefWidth="825" minHeight="550" spacing="10"/>
             </ScrollPane>
-            <HBox prefHeight="30" alignment="CENTER">
+
+            <HBox prefHeight="30" alignment="CENTER" spacing="5">
                 <padding>
                     <Insets bottom="5" top="5"/>
                 </padding>
-                <Button fx:id="nextCardButton" id="nextCardButton" text="   SHOW ANSWER   " disable="true" onAction="#answerButtonHandler"/>
+                <Button fx:id="nextCardButton" id="nextCardButton" text="   SHOW ANSWER   " disable="true" visible="false" onAction="#answerButtonHandler"/>
+                <Button fx:id="exitStudySessionButton" id="exitStudySessionButton" text="   EXIT STUDY SESSION   " disable="true" visible="false" onAction="#exitStudySessionButtonHandler"/>
             </HBox>
+
         </VBox>
+
     </center>
+
 </BorderPane>

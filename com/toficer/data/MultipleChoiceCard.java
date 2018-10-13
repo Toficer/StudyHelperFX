@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -47,8 +48,16 @@ public class MultipleChoiceCard extends Card {
     }
 
     @Override
-    public VBox getQuestionBox(){
+    public HBox getQuestionBox(){
+        HBox containerBox = new HBox();
+        containerBox.setMinHeight(50);
+        VBox stripeBox = new VBox();
+        stripeBox.setPrefWidth(50);
+        stripeBox.getStyleClass().add("QuestionStripeBox");
+        containerBox.getChildren().add(stripeBox);
         VBox questionBox = new VBox();
+        questionBox.setPadding(new Insets(5,5,5,5));
+        questionBox.getStyleClass().add("QuestionBox");
         questionBox.setMaxWidth(750);
         questionBox.setAlignment(Pos.CENTER);
         questionLabel.getStyleClass().add("descriptionLabel");
@@ -64,13 +73,21 @@ public class MultipleChoiceCard extends Card {
             radioButtonBox.getChildren().add(b);
         }
         questionBox.getChildren().add(radioButtonBox);
-        questionBox.setPadding(new Insets(0, 0, 5, 0));
-        return questionBox;
+        containerBox.getChildren().add(questionBox);
+        return containerBox;
     }
 
     @Override
-    public VBox getAnswerBox(){
+    public HBox getAnswerBox(){
+        HBox containerBox = new HBox();
+        containerBox.setMinHeight(50);
+        VBox stripeBox = new VBox();
+        stripeBox.setPrefWidth(50);
+        stripeBox.getStyleClass().add("AnswerStripeBox");
+        containerBox.getChildren().add(stripeBox);
         VBox answerBox = new VBox();
+        answerBox.setPadding(new Insets(5,5,5,5));
+        answerBox.getStyleClass().add("QuestionBox");
         answerBox.setMaxWidth(750);
         answerBox.setAlignment(Pos.CENTER);
         if(answers.get(correctAnswer).isSelected()){
@@ -85,7 +102,8 @@ public class MultipleChoiceCard extends Card {
             answerBox.getChildren().add(incorrectLabel);
             answerBox.getChildren().add(correctLabel);
         }
-        return answerBox;
+        containerBox.getChildren().add(answerBox);
+        return containerBox;
     }
 
     @Override
@@ -93,9 +111,23 @@ public class MultipleChoiceCard extends Card {
 
         VBox descriptionBox = new VBox();
         descriptionBox.setAlignment(Pos.TOP_CENTER);
-        descriptionBox.getChildren().add(new ImageView(getCardImage()));
         descriptionBox.getChildren().add(getQuestionBox());
-        descriptionBox.getChildren().add(new Label("Correct answer: " + answers.get(correctAnswer).getText()));
+        descriptionBox.setSpacing(10);
+        HBox containerBox = new HBox();
+        containerBox.setMinHeight(50);
+        VBox stripeBox = new VBox();
+        stripeBox.setPrefWidth(50);
+        stripeBox.getStyleClass().add("AnswerStripeBox");
+        containerBox.getChildren().add(stripeBox);
+        VBox answerBox = new VBox();
+        answerBox.setPadding(new Insets(5,5,5,5));
+        answerBox.getStyleClass().add("QuestionBox");
+        answerBox.setMaxWidth(750);
+        answerBox.setAlignment(Pos.CENTER);
+        Label correctLabel = new Label("CORRECT ANSWER: " + answers.get(correctAnswer).getText());
+        answerBox.getChildren().add(correctLabel);
+        containerBox.getChildren().add(answerBox);
+        descriptionBox.getChildren().add(containerBox);
 
         return descriptionBox;
     }
@@ -117,8 +149,8 @@ public class MultipleChoiceCard extends Card {
     @Override
     public String toString(){
         if(questionLabel.getText().length() > 30){
-            return (" " + questionLabel.getText().substring(0, 26) + "...");
+            return (questionLabel.getText().substring(0, 26) + "...");
         }
-        else return (" " + questionLabel.getText());
+        else return (questionLabel.getText());
     }
 }

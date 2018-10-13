@@ -1,23 +1,24 @@
 package com.toficer.mainwindow;
 
-import com.toficer.data.Card;
-import com.toficer.data.DataModel;
-import com.toficer.data.Deck;
-import com.toficer.data.Folder;
-import com.toficer.dialogs.*;
+import com.toficer.data.*;
+import com.toficer.dialogs.controllers.*;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Orientation;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Random;
@@ -37,17 +38,13 @@ public class MainWindowController {
     public static final int INPUT_CONTEXT_FOLDER = 0; // Leaving more options than needed, just in case.
     public static final int INPUT_CONTEXT_DECK = 1; // Leaving more options than needed, just in case.
     public static final int INPUT_CONTEXT_CARD = 2; // Leaving more options than needed, just in case.
+    public static final int INPUT_CONTEXT_EMPTY = 3; // Leaving more options than needed, just in case.
     public static final int STATE_ANSWERING = 0;
     public static final int STATE_ANSWERED = 1;
-    private Image folderImage;
-    private Image deckImage;
-    private Image cardImage;
-    private Image exitButtonImage;
-    private Image exitButtonHoverImage;
-    private Image minimizeButtonImage;
-    private Image minimizeButtonHoverImage;
+    public static final int CREATION_FOLDER = 0;
+    public static final int CREATION_DECK = 1;
+    public static final int CREATION_CARD = 2;
     private int currentState = STATE_ANSWERED;
-
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -72,21 +69,14 @@ public class MainWindowController {
     @FXML
     Button nextCardButton;
     @FXML
+    Button exitStudySessionButton;
+    @FXML
     VBox centerContentBox;
     @FXML
     ScrollPane centerScrollPane;
 
     @FXML
     public void initialize(){
-
-        // Loading images...
-        folderImage = new Image("images/folder.png");
-        deckImage = new Image("images/deck.png");
-        cardImage = new Image("images/file.png");
-        exitButtonImage = new Image("images/exitButton.png");
-        exitButtonHoverImage = new Image("images/exitButtonHover.png");
-        minimizeButtonImage = new Image("images/minimizeButton.png");
-        minimizeButtonHoverImage = new Image("images/minimizeButtonHover.png");
 
         // Setting up the list.
         DataModel.getData().loadFolders();
@@ -97,23 +87,10 @@ public class MainWindowController {
         // Changing the questionLabel to display the selected item's description or (in case of cards) the question and the answer.
         mainListView.getSelectionModel().selectedItemProperty().addListener((ChangeListener<Object>) (observable, oldValue, newValue) -> {
             if(newValue != null){
-                if(mainListView.getSelectionModel().getSelectedItem() instanceof Folder){
-                    Folder folder = (Folder)mainListView.getSelectionModel().getSelectedItem();
-                    //questionLabel.setText(folder.getDescription());
-                    centerContentBox.getChildren().clear();
-                    centerContentBox.getChildren().add(folder.getDescriptionBox());
-                }
-                else if(mainListView.getSelectionModel().getSelectedItem() instanceof Deck){
-                    Deck deck = (Deck)mainListView.getSelectionModel().getSelectedItem();
-                    //questionLabel.setText(deck.getDescription());
-                    centerContentBox.getChildren().clear();
-                    centerContentBox.getChildren().add(deck.getDescriptionBox());
-                }
-                else if(mainListView.getSelectionModel().getSelectedItem() instanceof Card){
-                    Card card = (Card)mainListView.getSelectionModel().getSelectedItem();
-                    //questionLabel.setText(card.getQuestionStringRepresentation());
-                    centerContentBox.getChildren().clear();
-                    centerContentBox.getChildren().add(card.getDescriptionBox());
+                centerContentBox.getChildren().clear();
+                Object obj = mainListView.getSelectionModel().getSelectedItem();
+                if(obj instanceof DisplayableInListView){
+                    centerContentBox.getChildren().add(((DisplayableInListView)obj).getDescriptionBox());
                 }
             }
         });
@@ -122,12 +99,14 @@ public class MainWindowController {
         ContextMenu folderContext = generateListViewContextMenu(INPUT_CONTEXT_FOLDER);
         ContextMenu deckContext = generateListViewContextMenu(INPUT_CONTEXT_DECK);
         ContextMenu cardContext = generateListViewContextMenu(INPUT_CONTEXT_CARD);
+        ContextMenu emptyFieldContext = generateListViewContextMenu(INPUT_CONTEXT_EMPTY);
 
 
         // ListView cell formatting and assigning the context menu.
         generateListViewCellFactory(folderContext, deckContext, cardContext);
-
+        mainListView.setContextMenu(emptyFieldContext);
         // BELOW: adding all needed window listeners...
+        // including window movement
 
         topBox.setOnMousePressed(event -> {
             xOffset = event.getSceneX();
@@ -141,75 +120,92 @@ public class MainWindowController {
             DataModel.getData().closeConnection();
             System.exit(0);
         });
-        exitButton.setOnMouseEntered(event -> exitButton.setImage(exitButtonHoverImage));
-        exitButton.setOnMouseExited(event -> exitButton.setImage(exitButtonImage));
-        minimizeButton.setOnMouseEntered(event -> minimizeButton.setImage(minimizeButtonHoverImage));
-        minimizeButton.setOnMouseExited(event -> minimizeButton.setImage(minimizeButtonImage));
+        exitButton.setOnMouseEntered(event -> exitButton.setImage(DataModel.getData().getExitButtonHoverImage()));
+        exitButton.setOnMouseExited(event -> exitButton.setImage(DataModel.getData().getExitButtonImage()));
+        minimizeButton.setOnMouseEntered(event -> minimizeButton.setImage(DataModel.getData().getMinimizeButtonHoverImage()));
+        minimizeButton.setOnMouseExited(event -> minimizeButton.setImage(DataModel.getData().getMinimizeButtonImage()));
         minimizeButton.setOnMousePressed(event -> stage.setIconified(true));
     }
 
+    // displays a creation dialog for a new folder object
     @FXML
     public void addNewFolder(){
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Dialog<ButtonType> dialog = createDialog("CREATE NEW FOLDER",
+        displayCreationDialog("CREATE NEW FOLDER",
                 "NEW FOLDER: TYPE IN THE DATA AND PRESS OK",
                 "folderdialog.fxml",
                 "FolderDialog",
                 INPUT_OK_CANCEL,
-                fxmlLoader);
-
-        FolderDialogController controller = fxmlLoader.getController();
-
-        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!controller.validateInput()) event.consume();
-        });
-
-        Optional<ButtonType> result = dialog.showAndWait();
-
-        if(result.isPresent() && result.get() == ButtonType.OK) {
-            controller.createFolder();
-        }
-
+                fxmlLoader,
+                CREATION_DECK,
+                INPUT_CONTEXT);
     }
 
-    @FXML
+    // displays a creation dialog for a new deck object
+    // the input parameter specifies whether the window is called from a context menu,
+    // or from a button in the menu bar (which determines whether it will be filled with
+    // information on the currently selected folder or not)
     public void addNewDeck(int input){
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Dialog<ButtonType> dialog = createDialog("CREATE NEW DECK",
+        displayCreationDialog("CREATE NEW DECK",
                 "NEW DECK: TYPE IN THE DATA AND PRESS OK",
                 "deckdialog.fxml",
                 "DeckDialog",
                 INPUT_OK_CANCEL,
-                fxmlLoader);
-
-        DeckDialogController controller = fxmlLoader.getController();
-
-        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!controller.validateInput()) event.consume();
-        });
-
-        if(mainListView.getSelectionModel().getSelectedItem() instanceof Folder && input==INPUT_CONTEXT){
-            controller.select((Folder)mainListView.getSelectionModel().getSelectedItem());
-        }
-
-        Optional<ButtonType> result = dialog.showAndWait();
-
-        if(result.isPresent() && result.get() == ButtonType.OK) {
-            controller.createDeck();
-        }
+                fxmlLoader,
+                CREATION_DECK,
+                input);
     }
 
+    // calls the addNewDeck() method with the INPUT_MENU input value
+    // which results in a creation window with empty fields
     @FXML
     public void addNewDeckFromMenu(){
         addNewDeck(INPUT_MENU);
     }
 
+    // displays a generic dialog that allows the user to choose the type of card
+    // they want to create
+    // the input parameter specifies whether the window is called from a context menu,
+    // or from a button in the menu bar (which determines whether it will be filled with
+    // information on the currently selected deck or not - it is then passed to the
+    // user-chosen card creation dialog
+    public void displayCardTypeSelectionDialog(int input){
+
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        Dialog<ButtonType> dialog = displayGenericDialog("NEW CARD",
+                "CHOOSE THE CARD TYPE",
+                "cardtypedialog.fxml",
+                "CardTypeDialog",
+                INPUT_OK_CANCEL,
+                fxmlLoader);
+
+        CardTypeDialogController controller = fxmlLoader.getController();
+        addDialogInputValidation(dialog, fxmlLoader);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if(result.isPresent() && result.get() == ButtonType.OK) {
+            controller.addNewCard(mainWindow, mainListView, input);
+            if(DataModel.getData().getCurrentDeck() != null){
+                enterCardList(DataModel.getData().getCurrentDeck());
+            }
+        }
+    }
+
+    // calls the displayCardTypeSelectionDialog() method with the INPUT_MENU input value
+    // which later results in a card creation window with empty fields
+    @FXML
+    public void displayCardTypeSelectionDialogFromMenu(){
+        displayCardTypeSelectionDialog(INPUT_MENU);
+    }
+
+    // displays a generic dialog window with a single "OK" button
+    // the dialog contains information on the program
     @FXML
     public void displayInfo(){
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Dialog<ButtonType> dialog = createDialog("INFO AND CREDITS",
+        Dialog<ButtonType> dialog = displayGenericDialog("INFO AND CREDITS",
                 "INFO AND CREDITS",
                 "infodialog.fxml",
                 "InfoDialog",
@@ -219,43 +215,48 @@ public class MainWindowController {
         dialog.showAndWait();
     }
 
-    @FXML
+    // loads the contents of a chosen folder and displays them inside the mainListView
+    // also clears the centerContentBox of any descriptions and updates the locationLabel
+    // with the current folder path
     public void enterDeckList(Folder folder){
         DataModel.getData().loadDecks(folder);
         DataModel.getData().setCurrentFolder(folder);
         mainListView.setItems(DataModel.getData().getListViewDecks());
         backButton.setDisable(false);
-        locationLabel.setText("HOME >" + folder.toString());
+        locationLabel.setText("HOME > " + folder.toString());
         centerContentBox.getChildren().clear();
     }
 
-    @FXML
+    // loads the contents of a chosen deck and displays them inside the mainListView
+    // also clears the centerContentBox of any descriptions and updates the locationLabel
+    // with the current deck path
     public void enterCardList(Deck deck){
         DataModel.getData().loadCards(deck);
         DataModel.getData().setCurrentDeck(deck);
         mainListView.setItems(DataModel.getData().getListViewCards());
         backButton.setDisable(false);
-        locationLabel.setText("HOME >" + DataModel.getData().getCurrentFolder().toString() + " >" + deck.toString());
+        locationLabel.setText("HOME > " + DataModel.getData().getCurrentFolder().toString() + " > " + deck.toString());
         centerContentBox.getChildren().clear();
     }
 
+    // loads the contents of the previous folder or folder list
     @FXML
     public void backToPreviousList(){
         if(DataModel.getData().getCurrentDeck() == null){
             mainListView.setItems(DataModel.getData().getListViewFolders());
             DataModel.getData().setCurrentFolder(null);
             backButton.setDisable(true);
-            locationLabel.setText("HOME >");
+            locationLabel.setText("HOME > ");
         }
         else {
             mainListView.setItems(DataModel.getData().getListViewDecks());
             DataModel.getData().setCurrentDeck(null);
-            locationLabel.setText("HOME >" + DataModel.getData().getCurrentFolder().toString());
+            locationLabel.setText("HOME > " + DataModel.getData().getCurrentFolder().toString());
         }
         centerContentBox.getChildren().clear();
     }
 
-    @FXML
+    // calls the appropriate editX() method for the item editing dialog creation process.
     public void editItem(){
         if(mainListView.getSelectionModel().getSelectedItem() instanceof Folder){
             editFolder((Folder)(mainListView.getSelectionModel().getSelectedItem()));
@@ -268,21 +269,20 @@ public class MainWindowController {
         }
     }
 
+    // displays the folder creation window for the chosen folder
+    // which is filled with the folder's parameters, allowing for editing it
     public void editFolder(Folder folder){
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Dialog<ButtonType> dialog = createDialog("EDIT FOLDER",
+        Dialog<ButtonType> dialog = displayGenericDialog("EDIT FOLDER",
                 "EDIT FOLDER: TYPE IN THE DATA AND PRESS OK",
                 "folderdialog.fxml",
                 "FolderDialog",
                 INPUT_OK_CANCEL,
                 fxmlLoader);
 
-        FolderDialogController controller = fxmlLoader.getController();
+        FolderCreationDialogController controller = fxmlLoader.getController();
 
-        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!controller.validateInput()) event.consume();
-        });
+        addDialogInputValidation(dialog, fxmlLoader);
 
         controller.loadData(folder);
 
@@ -290,26 +290,25 @@ public class MainWindowController {
 
         if(result.isPresent() && result.get() == ButtonType.OK) {
             controller.updateFolder(folder);
-            DataModel.getData().populateDeckListView(DataModel.getData().getCurrentFolder().get_id());
+            DataModel.getData().populateFolderListView();
             mainListView.refresh();
         }
     }
 
+    // displays the deck creation window for the chosen deck
+    // which is filled with the deck's parameters, allowing for editing it
     public void editDeck(Deck deck){
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Dialog<ButtonType> dialog = createDialog("EDIT DECK",
+        Dialog<ButtonType> dialog = displayGenericDialog("EDIT DECK",
                 "EDIT DECK: TYPE IN THE DATA AND PRESS OK",
                 "deckdialog.fxml",
                 "DeckDialog",
                 INPUT_OK_CANCEL,
                 fxmlLoader);
 
-        DeckDialogController controller = fxmlLoader.getController();
+        DeckCreationDialogController controller = fxmlLoader.getController();
 
-        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!controller.validateInput()) event.consume();
-        });
+        addDialogInputValidation(dialog, fxmlLoader);
 
         controller.loadData(deck);
 
@@ -322,20 +321,19 @@ public class MainWindowController {
         }
     }
 
+    // displays the card creation window for the chosen card
+    // which is filled with the card's parameters, allowing for editing it
     public void editCard(Card card){
         FXMLLoader fxmlLoader = new FXMLLoader();
         if(card.getCardType() == DataModel.TYPE_SIMPLETEXT){
-            Dialog<ButtonType> dialog = createDialog("EDIT CARD",
+            Dialog<ButtonType> dialog = displayGenericDialog("EDIT CARD",
                     "EDIT CARD: TYPE IN THE DATA AND PRESS OK",
                     "simpletextcarddialog.fxml",
                     "SimpleTextCardDialog",
                     INPUT_OK_CANCEL,
                     fxmlLoader);
-            SimpleTextCardDialogController controller = fxmlLoader.getController();
-            final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-            okButton.addEventFilter(ActionEvent.ACTION, event -> {
-                if (!controller.validateInput()) event.consume();
-            });
+            SimpleTextCardCreationDialogController controller = fxmlLoader.getController();
+            addDialogInputValidation(dialog, fxmlLoader);
 
             controller.loadData(card);
 
@@ -348,17 +346,14 @@ public class MainWindowController {
             }
         }
         else if(card.getCardType() == DataModel.TYPE_MULTIPLECHOICE){
-            Dialog<ButtonType> dialog = createDialog("EDIT CARD",
+            Dialog<ButtonType> dialog = displayGenericDialog("EDIT CARD",
                     "EDIT CARD: TYPE IN THE DATA AND PRESS OK",
                     "multiplechoicecarddialog.fxml",
                     "MultipleChoiceCardDialog",
                     INPUT_OK_CANCEL,
                     fxmlLoader);
-            MultipleChoiceCardDialogController controller = fxmlLoader.getController();
-            final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-            okButton.addEventFilter(ActionEvent.ACTION, event -> {
-                if (!controller.validateInput()) event.consume();
-            });
+            MultipleChoiceCardCreationDialogController controller = fxmlLoader.getController();
+            addDialogInputValidation(dialog, fxmlLoader);
 
             controller.loadData(card);
 
@@ -372,13 +367,13 @@ public class MainWindowController {
         }
     }
 
-    @FXML
+    // displays the deletion confirmation window for the item selected in the mainListView
     public void deleteItem(){
         FXMLLoader fxmlLoader = new FXMLLoader();
 
         String itemType = mainListView.getSelectionModel().getSelectedItem().toString();
 
-        Dialog<ButtonType> dialog = createDialog("DELETE",
+        Dialog<ButtonType> dialog = displayGenericDialog("DELETE",
                 "DELETE" + itemType,
                 "deletedialog.fxml",
                 "DeleteDialog",
@@ -394,50 +389,24 @@ public class MainWindowController {
             else if(mainListView.getSelectionModel().getSelectedItem() instanceof Deck){
                 DataModel.getData().deleteDeck(((Deck) mainListView.getSelectionModel().getSelectedItem()).get_id());
             }
+            else if(mainListView.getSelectionModel().getSelectedItem() instanceof Card){
+                DataModel.getData().deleteCard(((Card) mainListView.getSelectionModel().getSelectedItem()).get_id());
+            }
             else System.err.println("ERROR: UNKNOWN ITEM TYPE, CAN'T DELETE FROM DB");
             mainListView.getItems().remove(mainListView.getSelectionModel().getSelectedItem());
         }
     }
 
-    @FXML
-    public void displayCardTypeSelectionDialog(int input){
-
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        Dialog<ButtonType> dialog = createDialog("NEW CARD",
-                "CHOOSE THE CARD TYPE",
-                "cardtypedialog.fxml",
-                "CardTypeDialog",
-                INPUT_OK_CANCEL,
-                fxmlLoader);
-
-        CardTypeDialogController controller = fxmlLoader.getController();
-
-        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!controller.validateInput()) event.consume();
-        });
-
-        Optional<ButtonType> result = dialog.showAndWait();
-
-        if(result.isPresent() && result.get() == ButtonType.OK) {
-            controller.addNewCard(mainWindow, mainListView, input);
-        }
-    }
-
-    @FXML
-    public void displayCardTypeSelectionDialogFromMenu(){
-        displayCardTypeSelectionDialog(INPUT_MENU);
-    }
-
-    @FXML
-    public Dialog<ButtonType> createDialog(String title, String headerText, String fxmlFile, String cssLabel, int dialogType, FXMLLoader fxmlLoader){
+    // creates a generic dialog with the chosen title and header texts
+    // the dialogType parameter specifies the buttons that need to be added to the dialog
+    public Dialog<ButtonType> displayGenericDialog(String title, String headerText, String fxmlFile, String cssLabel, int dialogType, FXMLLoader fxmlLoader) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initStyle(StageStyle.UNDECORATED);
         dialog.initOwner(mainWindow.getScene().getWindow());
         dialog.setTitle(title);
         dialog.setHeaderText(headerText);
 
-        fxmlLoader.setLocation(getClass().getResource("/com/toficer/dialogs/" + fxmlFile));
+        fxmlLoader.setLocation(getClass().getResource("/com/toficer/dialogs/fxml/" + fxmlFile));
 
         try {
             dialog.getDialogPane().setContent(fxmlLoader.load());
@@ -470,24 +439,73 @@ public class MainWindowController {
         return dialog;
     }
 
+    // calls the displayGenericDialog() method,
+    // the dialogType parameter specifies the buttons that need to be added to the dialog
+    // the creation_parameter specifies which special options need to be added to the dialog
+    // the input parameter specifies whether the window is called from a context menu,
+    // or from a button in the menu bar (which determines whether it will be filled with
+    // information on the currently selected item or not)
+    public void displayCreationDialog(String title, String headerText, String fxmlFile, String cssLabel, int dialogType, FXMLLoader fxmlLoader, int creation_parameter, int input){
+
+        Dialog<ButtonType> dialog = displayGenericDialog(title, headerText, fxmlFile, cssLabel, dialogType, fxmlLoader);
+        addDialogInputValidation(dialog, fxmlLoader);
+
+        CreationDialogController controller = fxmlLoader.getController();
+
+        if(creation_parameter == CREATION_DECK){
+            if(mainListView.getSelectionModel().getSelectedItem() instanceof Folder && input==INPUT_CONTEXT){
+                controller.select((Folder)mainListView.getSelectionModel().getSelectedItem());
+            }
+            else if(input==INPUT_CONTEXT_EMPTY){
+                controller.select(DataModel.getData().getCurrentFolder());
+            }
+        }
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if(result.isPresent() && result.get() == ButtonType.OK) {
+            controller.performCreation();
+        }
+
+        if(creation_parameter == CREATION_DECK){
+            if(DataModel.getData().getCurrentFolder() != null){
+                enterDeckList(DataModel.getData().getCurrentFolder());
+            }
+        }
+    }
+
+    // adds an input validation event handlet
+    public void addDialogInputValidation(Dialog<ButtonType> dialog, FXMLLoader loader){
+
+        ValidatingController controller = loader.getController();
+
+        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!controller.validateInput()) event.consume();
+        });
+    }
+
     @FXML
     public void answerButtonHandler(){
 
         if(currentState == STATE_ANSWERED){
-            System.out.println("NEXT CARD");
             if(DataModel.getData().getCurrentCard() != null){
                 DataModel.getData().getStudySession().remove(DataModel.getData().getCurrentCard());
             }
             if(DataModel.getData().getStudySession().size() == 0){
                 centerContentBox.getChildren().clear();
                 nextCardButton.setDisable(true);
+                exitStudySessionButton.setDisable(true);
+                nextCardButton.setVisible(false);
+                exitStudySessionButton.setVisible(false);
+                mainListView.setDisable(false);
+                backButton.setDisable(false);
             }
             else {
                 int currentCard = random.nextInt(DataModel.getData().getStudySession().size());
                 DataModel.getData().setCurrentCard(DataModel.getData().getStudySession().get(currentCard));
                 centerContentBox.getChildren().clear();
                 centerContentBox.getChildren().add(DataModel.getData().getCurrentCard().getQuestionBox());
-                centerContentBox.getChildren().add(new Separator(Orientation.HORIZONTAL));
                 nextCardButton.setText("   SHOW ANSWER   ");
                 currentState = STATE_ANSWERING;
             }
@@ -500,12 +518,31 @@ public class MainWindowController {
 
     }
 
+    @FXML
+    public void exitStudySessionButtonHandler(){
+        centerContentBox.getChildren().clear();
+        nextCardButton.setDisable(true);
+        exitStudySessionButton.setDisable(true);
+        mainListView.setDisable(false);
+        backButton.setDisable(false);
+        exitStudySessionButton.setVisible(false);
+        nextCardButton.setVisible(false);
+    }
+
     public void openStudySession(int deck_id){
         DataModel.getData().openStudySession(deck_id);
         if(DataModel.getData().getStudySession() != null){
+
+            exitStudySessionButton.setVisible(true);
+            nextCardButton.setVisible(true);
+
             nextCardButton.setDisable(false);
+            exitStudySessionButton.setDisable(false);
+
             nextCardButton.setText("   NEXT CARD   ");
             currentState = STATE_ANSWERED;
+            mainListView.setDisable(true);
+            backButton.setDisable(true);
             answerButtonHandler();
         }
     }
@@ -513,44 +550,61 @@ public class MainWindowController {
     public ContextMenu generateListViewContextMenu(int menuType){
         ContextMenu listViewMenu = new ContextMenu();
         listViewMenu.getStyleClass().add("listContext");
-        if(menuType != INPUT_CONTEXT_CARD){
-            MenuItem contextOpen = new MenuItem("Open/Study");
-            contextOpen.setOnAction(event -> {
-                Object item = mainListView.getSelectionModel().getSelectedItem();
-                if(item instanceof Folder) {
-                    enterDeckList((Folder)item);
-                }
-                else if(item instanceof Deck) {
-                    openStudySession(((Deck) item).get_id());
-                }
-            });
-            listViewMenu.getItems().addAll(contextOpen);
-        }
-        if(menuType != INPUT_CONTEXT_CARD){
-            MenuItem contextAdd = new MenuItem("Add...");
+        if(menuType == INPUT_CONTEXT_EMPTY){
+            MenuItem contextAdd = new MenuItem("Create new...");
             contextAdd.setOnAction(event -> {
-                if(mainListView.getSelectionModel().getSelectedItem() instanceof Folder){
-                    addNewDeck(INPUT_CONTEXT);
+                if(DataModel.getData().getCurrentDeck() != null){
+                    displayCardTypeSelectionDialog(INPUT_CONTEXT_EMPTY);
                 }
-                if(mainListView.getSelectionModel().getSelectedItem() instanceof Deck){
-                    displayCardTypeSelectionDialog(INPUT_CONTEXT);
+                else if(DataModel.getData().getCurrentFolder() != null){
+                    addNewDeck(INPUT_CONTEXT_EMPTY);
                 }
+                else addNewFolder();
             });
             listViewMenu.getItems().addAll(contextAdd);
         }
-        MenuItem contextEdit = new MenuItem("Edit");
-        contextEdit.setOnAction(event -> {
-            editItem();
-        });
-        listViewMenu.getItems().addAll(contextEdit);
-        MenuItem contextDelete = new MenuItem("Delete");
-        contextDelete.setOnAction(event -> {
-            deleteItem();
-        });
-        listViewMenu.getItems().addAll(contextDelete);
+        else {
+            if(menuType != INPUT_CONTEXT_CARD){
+                MenuItem contextOpen = new MenuItem("Open/Study");
+                contextOpen.setOnAction(event -> {
+                    Object item = mainListView.getSelectionModel().getSelectedItem();
+                    if(item instanceof Folder) {
+                        enterDeckList((Folder)item);
+                    }
+                    else if(item instanceof Deck) {
+                        openStudySession(((Deck) item).get_id());
+                    }
+                });
+                listViewMenu.getItems().addAll(contextOpen);
+            }
+            if(menuType != INPUT_CONTEXT_CARD){
+                MenuItem contextAdd = new MenuItem("Add...");
+                contextAdd.setOnAction(event -> {
+                    if(mainListView.getSelectionModel().getSelectedItem() instanceof Folder){
+                        addNewDeck(INPUT_CONTEXT);
+                    }
+                    if(mainListView.getSelectionModel().getSelectedItem() instanceof Deck){
+                        displayCardTypeSelectionDialog(INPUT_CONTEXT);
+                    }
+                });
+                listViewMenu.getItems().addAll(contextAdd);
+            }
+            MenuItem contextEdit = new MenuItem("Edit");
+            contextEdit.setOnAction(event -> {
+                editItem();
+            });
+            listViewMenu.getItems().addAll(contextEdit);
+            MenuItem contextDelete = new MenuItem("Delete");
+            contextDelete.setOnAction(event -> {
+                deleteItem();
+            });
+            listViewMenu.getItems().addAll(contextDelete);
+        }
+
         return listViewMenu;
     }
 
+    // TODO: need to get rid of those colors and put them somewhere else, possibly in the stylesheet.
     public void generateListViewCellFactory(ContextMenu folderContext, ContextMenu deckContext, ContextMenu cardContext){
         mainListView.setCellFactory(new Callback<ListView<Object>, ListCell<Object>>() {
             @Override
@@ -567,13 +621,15 @@ public class MainWindowController {
                         else {
                             setText(item.toString());
 
+                            if(!isSelected()) setStyle("-fx-background-color: #003459");
+
                             if(item instanceof Folder){
-                                view.setImage(folderImage);
+                                view.setImage(DataModel.getData().getFolderImage());
                             }
                             else if(item instanceof Deck){
-                                view.setImage(deckImage);
+                                view.setImage(DataModel.getData().getDeckImage());
                             }
-                            else view.setImage(cardImage);
+                            else view.setImage(DataModel.getData().getCardImage());
 
                             view.setFitHeight(32);
                             view.setFitWidth(32);
@@ -598,6 +654,9 @@ public class MainWindowController {
                         }
                 );
                 cell.setOnMouseClicked(event -> {
+                    if(!cell.isEmpty()){
+                        cell.setStyle("-fx-background-color: #007eaf");
+                    }
                     if (event.getClickCount() == 2) {
                         Object item = mainListView.getSelectionModel().getSelectedItem();
                         if(item instanceof Folder) {
@@ -607,6 +666,14 @@ public class MainWindowController {
                             enterCardList((Deck)item);
                         }
                     }
+                });
+                cell.setOnMouseEntered(event -> {
+                    if(!cell.isSelected() && !cell.isEmpty()) cell.setStyle("-fx-background-color: #003e64");
+                    else if(!cell.isEmpty()) cell.setStyle("-fx-background-color: #007eaf");
+                });
+                cell.setOnMouseExited(event -> {
+                    if(!cell.isSelected()) cell.setStyle("-fx-background-color: #003459");
+                    else cell.setStyle("-fx-background-color: #007eaf");
                 });
                 return cell;
             }

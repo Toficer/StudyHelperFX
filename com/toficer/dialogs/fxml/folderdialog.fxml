@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<DialogPane id="folderDialogWindow" fx:controller="com.toficer.dialogs.controllers.FolderCreationDialogController" xmlns:fx="http://javafx.com/fxml">
+    <content>
+        <GridPane hgap="10" vgap="10" alignment="CENTER">
+            <HBox GridPane.rowIndex="0" GridPane.columnIndex="0" alignment="CENTER_RIGHT">
+                <Label id="nameLabel" text="FOLDER NAME:"/>
+            </HBox>
+            <TextField fx:id="folderField" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.columnSpan="2" prefWidth="300"/>
+            <HBox GridPane.rowIndex="1" GridPane.columnIndex="0" alignment="CENTER_RIGHT">
+                <Label id="descLabel" text="SHORT DESCRIPTION:"/>
+            </HBox>
+            <TextField fx:id="descriptionField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="2" prefWidth="300"/>
+            <HBox GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="2" alignment="CENTER_RIGHT">
+                <Label fx:id="warningLabel" id="warningLabel" wrapText="true" text="WARNING: FIELDS MUST NOT BE EMPTY AND MUST NOT CONTAIN CHARACTERS ' OR \" maxWidth="300" visible="false"/>
+            </HBox>
+        </GridPane>
+    </content>
+</DialogPane>

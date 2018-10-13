@@ -2,6 +2,7 @@ package com.toficer.data;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,9 +13,9 @@ public class DataModel {
     public static final String DATABASE_TYPE_MYSQL = "jdbc:mysql:";
     public static final String DATABASE_NAME_SQLITE = "cardbase.db";
     public static final String DATABASE_PATH_SQLITE = "C:\\Users\\Toficer\\Documents\\StudyHelperData\\";
-    public static final String DATABASE_NAME_MYSQL = "studyhelper";
-    public static final String DATABASE_PATH_MYSQL = "//db4free.net:3306/";
-    public static final String CONNECTION_STRING = DATABASE_TYPE_SQLITE + DATABASE_PATH_SQLITE + DATABASE_NAME_SQLITE;
+    public static final String DATABASE_NAME_MYSQL = "not_your_business";
+    public static final String DATABASE_PATH_MYSQL = "not_your_business";
+    public static final String CONNECTION_STRING = DATABASE_TYPE_MYSQL + DATABASE_PATH_MYSQL + DATABASE_NAME_MYSQL;
 
     public static final String FOLDER_TABLE = "SH_Folders";
     public static final String FOLDER_ID = "_id";
@@ -44,6 +45,12 @@ public class DataModel {
     public static final String MYSQL_FOLDER_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + FOLDER_TABLE + "  (" + FOLDER_ID +
             " INTEGER AUTO_INCREMENT, " + FOLDER_NAME + " TEXT, " + FOLDER_DESC + " TEXT, PRIMARY KEY (" + FOLDER_ID + "))";
 
+    public static final String MYSQL_DECK_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + DECK_TABLE + "  (" + DECK_ID +
+            " INTEGER AUTO_INCREMENT, " + DECK_NAME + " TEXT, " + DECK_DESC + " TEXT, " + DECK_FOLDERID + " INTEGER , PRIMARY KEY (" + DECK_ID + "))";
+
+    public static final String MYSQL_CARD_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + CARD_TABLE + "  (" + CARD_ID +
+            " INTEGER AUTO_INCREMENT, " + CARD_QUESTION + " TEXT, " + CARD_ANSWER + " TEXT, " + CARD_TYPE + " TEXT, " + CARD_DECKID + " INTEGER, PRIMARY KEY (" + FOLDER_ID + "))";
+
     public static final String SQLITE_FOLDER_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + FOLDER_TABLE + "  (" + FOLDER_ID +
             " INTEGER PRIMARY KEY AUTOINCREMENT, " + FOLDER_NAME + " STRING, " + FOLDER_DESC + " STRING)";
     public static final String SQLITE_DECK_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + DECK_TABLE + "  (" + DECK_ID +
@@ -51,6 +58,13 @@ public class DataModel {
     public static final String SQLITE_CARD_CREATETABLE = "CREATE TABLE IF NOT EXISTS " + CARD_TABLE + "  (" + CARD_ID +
             " INTEGER PRIMARY KEY AUTOINCREMENT, " + CARD_QUESTION + " STRING, " + CARD_ANSWER + " STRING, "+ CARD_TYPE + " STRING, " + CARD_DECKID + " INTEGER)";
 
+    private Image folderImage;
+    private Image deckImage;
+    private Image cardImage;
+    private Image exitButtonImage;
+    private Image exitButtonHoverImage;
+    private Image minimizeButtonImage;
+    private Image minimizeButtonHoverImage;
 
     private static DataModel data = new DataModel();
     private ObservableList<Folder> currentListViewFolders;
@@ -76,12 +90,23 @@ public class DataModel {
     }
 
     private DataModel() {
+        loadImages();
         openConnection();
+    }
+
+    public void loadImages(){
+        folderImage = new Image("images/folder.png");
+        deckImage = new Image("images/deck.png");
+        cardImage = new Image("images/file.png");
+        exitButtonImage = new Image("images/exitButton.png");
+        exitButtonHoverImage = new Image("images/exitButtonHover.png");
+        minimizeButtonImage = new Image("images/minimizeButton.png");
+        minimizeButtonHoverImage = new Image("images/minimizeButtonHover.png");
     }
 
     public boolean openConnection(){
         try {
-            connection = DriverManager.getConnection(CONNECTION_STRING);
+            connection = DriverManager.getConnection(CONNECTION_STRING, "not_your_business", "not_your_business");
             return true;
         } catch (SQLException e) {
             System.out.println("CONNECTION FAILED: " + e.getMessage());
@@ -129,6 +154,34 @@ public class DataModel {
         this.currentCard = currentCard;
     }
 
+    public Image getFolderImage() {
+        return folderImage;
+    }
+
+    public Image getDeckImage() {
+        return deckImage;
+    }
+
+    public Image getCardImage() {
+        return cardImage;
+    }
+
+    public Image getExitButtonImage() {
+        return exitButtonImage;
+    }
+
+    public Image getExitButtonHoverImage() {
+        return exitButtonHoverImage;
+    }
+
+    public Image getMinimizeButtonImage() {
+        return minimizeButtonImage;
+    }
+
+    public Image getMinimizeButtonHoverImage() {
+        return minimizeButtonHoverImage;
+    }
+
     public void loadFolders(){
         currentListViewFolders = FXCollections.observableArrayList();
         populateFolderListView();
@@ -147,8 +200,9 @@ public class DataModel {
     public void populateFolderListView(){
         try {
             Statement stmt = connection.createStatement();
+            currentListViewFolders.clear();
 
-            stmt.execute(SQLITE_FOLDER_CREATETABLE);
+            stmt.execute(MYSQL_FOLDER_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + FOLDER_TABLE);
             String name, desc;
             int id;
@@ -171,7 +225,7 @@ public class DataModel {
             currentListViewDecks.clear();
             Statement stmt = connection.createStatement();
 
-            stmt.execute(SQLITE_DECK_CREATETABLE);
+            stmt.execute(MYSQL_DECK_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
             if(rs != null){
                 while(rs.next()){
@@ -189,7 +243,7 @@ public class DataModel {
             currentListViewCards.clear();
             Statement stmt = connection.createStatement();
 
-            stmt.execute(SQLITE_CARD_CREATETABLE);
+            stmt.execute(MYSQL_CARD_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
             while(rs.next()){
                 if(rs.getString(CARD_TYPE).equals(TYPE_SIMPLETEXT)){
@@ -211,7 +265,7 @@ public class DataModel {
         try {
             Statement stmt = connection.createStatement();
 
-            stmt.execute(SQLITE_DECK_CREATETABLE);
+            stmt.execute(MYSQL_DECK_CREATETABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
             if(rs != null){
                 while(rs.next()){
@@ -228,7 +282,7 @@ public class DataModel {
     public void addFolder(Folder folder){
 
         try {
-            PreparedStatement stmt = connection.prepareStatement(SQLITE_FOLDER_CREATETABLE);
+            PreparedStatement stmt = connection.prepareStatement(MYSQL_FOLDER_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + FOLDER_TABLE +
                     " (" + FOLDER_NAME + ", " + FOLDER_DESC + ") VALUES ('" + folder.getName() +
@@ -294,7 +348,7 @@ public class DataModel {
     public void addDeck(Deck deck){
 
         try {
-            PreparedStatement stmt = connection.prepareStatement(SQLITE_DECK_CREATETABLE);
+            PreparedStatement stmt = connection.prepareStatement(MYSQL_DECK_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + DECK_TABLE +
                     " (" + DECK_NAME + ", " + DECK_DESC + ", " + DECK_FOLDERID + ") VALUES ('" + deck.getName() +
@@ -314,7 +368,7 @@ public class DataModel {
 
     public void addCard(Card card){
         try {
-            PreparedStatement stmt = connection.prepareStatement(SQLITE_CARD_CREATETABLE);
+            PreparedStatement stmt = connection.prepareStatement(MYSQL_CARD_CREATETABLE);
             stmt.execute();
             stmt = connection.prepareStatement("INSERT INTO " + CARD_TABLE +
                     " (" + CARD_QUESTION + ", " + CARD_ANSWER + ", " + CARD_TYPE + ", " + CARD_DECKID + ") VALUES ('" + card.getQuestionStringRepresentation() +
@@ -337,6 +391,7 @@ public class DataModel {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT count(*) AS count FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
             int count;
+            rs.next();
             count = rs.getInt("count");
             if(count>0){
                 rs = stmt.executeQuery("SELECT * FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
@@ -361,8 +416,9 @@ public class DataModel {
 
     public void deleteFolder(int folder_id){
         try {
+            Statement Resultstmt = connection.createStatement();
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
+            ResultSet rs = Resultstmt.executeQuery("SELECT * FROM " + DECK_TABLE + " WHERE " + DECK_FOLDERID + "=" + folder_id);
             while(rs.next()){
                 stmt.execute("DELETE FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + rs.getInt(DECK_ID));
             }
@@ -378,6 +434,15 @@ public class DataModel {
             Statement stmt = connection.createStatement();
             stmt.execute("DELETE FROM " + CARD_TABLE + " WHERE " + CARD_DECKID + "=" + deck_id);
             stmt.execute("DELETE FROM " + DECK_TABLE + " WHERE " + DECK_ID + "=" + deck_id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteCard(int card_id){
+        try {
+            Statement stmt = connection.createStatement();
+            stmt.execute("DELETE FROM " + CARD_TABLE + " WHERE " + CARD_ID + "=" + card_id);
         } catch (SQLException e) {
             e.printStackTrace();
         }

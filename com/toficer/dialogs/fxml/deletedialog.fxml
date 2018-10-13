@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.toficer.dialogs.controllers.DeleteDialogController">
+
+    <content>
+        <VBox>
+            <Label text="Are you sure you want to do this?"/>
+            <Label text="This operation can't be reversed!"/>
+        </VBox>
+
+    </content>
+
+</DialogPane>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.toficer.dialogs.controllers.InfoDialogController">
+
+    <content>
+        <VBox prefWidth="400">
+            <Label text="StudyHelperFX, by Rafał Raczyński"/>
+            <Separator orientation="HORIZONTAL" style="-fx-background-color: black"/>
+            <Label text="Icon and background image made by Freepik from www.flaticon.com" wrapText="true"/>
+            <Label text="Folder and Card icons made by Smashicons from www.flaticon.com" wrapText="true"/>
+            <Label text="Deck icon made by Gregor Cresnar from www.flaticon.com" wrapText="true"/>
+        </VBox>
+    </content>
+
+</DialogPane>

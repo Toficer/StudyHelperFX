@@ -1,12 +1,14 @@
 package com.toficer.data;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public abstract class Card {
+public abstract class Card implements DisplayableInListView{
     private int _id;
     private String questionStringRepresentation;
     private String answerStringRepresentation;
@@ -35,18 +37,16 @@ public abstract class Card {
 
         VBox descriptionBox = new VBox();
         descriptionBox.setAlignment(Pos.TOP_CENTER);
-        descriptionBox.getChildren().add(new ImageView(cardImage));
-        Label nameLabel = new Label(getQuestionStringRepresentation());
-        nameLabel.setWrapText(true);
-        nameLabel.getStyleClass().add("descriptionLabel");
-        descriptionBox.getChildren().add(nameLabel);
+        //descriptionBox.setPadding(new Insets(15,0,0,0));
+        descriptionBox.setSpacing(10);
+        descriptionBox.getChildren().add(getQuestionBox());
         descriptionBox.getChildren().add(getAnswerBox());
 
         return descriptionBox;
     }
 
-    public abstract VBox getQuestionBox();
-    public abstract VBox getAnswerBox();
+    public abstract HBox getQuestionBox();
+    public abstract HBox getAnswerBox();
 
     public int get_id() {
         return _id;

@@ -48,9 +48,9 @@
 }
 #lowerCenterBox {
     -fx-background-color: #ffffff;
-    -fx-background-image: url("images/largeLogo.png");
-    -fx-background-position: center top;
-    -fx-background-repeat: no-repeat;
+    /*-fx-background-image: url("images/largeLogo.png");*/
+    /*-fx-background-position: center top;*/
+    /*-fx-background-repeat: no-repeat;*/
 }
 #folderDialogWindow {
 }
@@ -63,6 +63,18 @@
 #nextCardButton:hover {
     -fx-background-color: #003c66;
     -fx-text-fill: #dcdcdd;
+    -fx-font-size: 18;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+#exitStudySessionButton {
+    -fx-background-color: #003459;
+    -fx-text-fill: #c40000;
+    -fx-font-size: 18;
+    -fx-font-family: "Gill Sans MT Condensed";
+}
+#exitStudySessionButton:hover {
+    -fx-background-color: #003c66;
+    -fx-text-fill: #cf0000;
     -fx-font-size: 18;
     -fx-font-family: "Gill Sans MT Condensed";
 }
@@ -90,7 +102,8 @@
 /*Menu bar (File, Card...)*/
 .menu-bar {
      -fx-background-color: #007eaf;
-     -fx-font-size: 22;
+     /*-fx-font-size: 22;*/
+    -fx-font-size: 20;
  }
 /*Menu bar font color*/
 .menu .label {
@@ -151,6 +164,9 @@
 }
 .list-cell:odd:selected {
     -fx-background-color: #007eaf;
+    -fx-background-image: url("images/arrow.png");
+    -fx-background-position: right;
+    -fx-background-repeat: no-repeat;
     -fx-text-fill: #dcdcdd;
     -fx-font-family: "Gill Sans MT Condensed";
     -fx-font-weight: bold;
@@ -162,6 +178,9 @@
 }
 .list-cell:even:selected {
     -fx-background-color: #007eaf;
+    -fx-background-image: url("images/arrow.png");
+    -fx-background-position: right;
+    -fx-background-repeat: no-repeat;
     -fx-text-fill: #dcdcdd;
     -fx-font-family: "Gill Sans MT Condensed";
     -fx-font-weight: bold;
@@ -169,7 +188,9 @@
 .list-view {
     -fx-background-color: transparent;
     -fx-text-fill: #b3b1be;
-    -fx-font-size: 25;
+    -fx-font-size: 20;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
 }
 .list-view .scroll-bar {
     -fx-pref-width: 10;
@@ -222,6 +243,38 @@
 -fx-text-fill: #dcdcdd;
 -fx-font-size: 18;
 -fx-font-family: "Gill Sans MT Condensed";
+}
+.QuestionBox {
+    -fx-background-color: #f2f2f3;
+    -fx-border-wodth: 2px;
+    -fx-border-color: #003459;
+    -fx-border-style: solid;
+}
+.QuestionStripeBox {
+    -fx-background-color: #003459;
+    -fx-background-image: url("images/questionMark.png");
+    -fx-background-position: left top;
+    -fx-background-repeat: no-repeat;
+}
+.AnswerStripeBox {
+    -fx-background-color: #003459;
+    -fx-background-image: url("images/exclamationMark.png");
+    -fx-background-position: left top;
+    -fx-background-repeat: no-repeat;
+}
+.FolderStripeBox {
+    -fx-background-color: #003459;
+    -fx-background-image: url("images/folder.png");
+    -fx-background-size: 40px 40px;
+    -fx-background-position: left 5px top 5px;
+    -fx-background-repeat: no-repeat;
+}
+.DeckStripeBox {
+    -fx-background-color: #003459;
+    -fx-background-image: url("images/deck.png");
+    -fx-background-size: 40px 40px;
+    -fx-background-position: left 5px top 5px;
+    -fx-background-repeat: no-repeat;
 }
 .FolderDialog {
     -fx-border-color: #003459;
